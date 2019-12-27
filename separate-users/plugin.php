@@ -8,7 +8,7 @@ Author: Ian Barber <ian.barber@gmail.com>
 Author URI: http://phpir.com/
 */
 if((yourls_is_active_plugin('authMgrPlus/plugin.php')) !== false) {
-	die('Separate Users is dedicated to Auth Manager Plus.');
+	die('Separate Users is deprecated to Auth Manager Plus.');
 }
 /**
  * Set the environment variables
@@ -149,11 +149,11 @@ function separate_users_admin_list_where($where) {
 	}
 
 	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-		$where['sql'] = $where['sql'] . " AND (`user` = :user OR `user` IS NULL) ";
+		$where['sql'] = $where['sql'] . " AND (`user` = :user) ";
 		$where['binds']['user'] = $user;
 	}
 	else
-		$where = $where . " AND (`user` = $user OR `user` IS NULL) ";
+		$where = $where . " AND (`user` = $user) ";
 
 	return $where;
 }
@@ -180,13 +180,13 @@ function separate_users_get_db_stats( $return, $where ) {
 	$table_url = YOURLS_DB_TABLE_URL;
 
 	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-		$where['sql'] = $where['sql'] . " AND (`user` = :user OR `user` IS NULL) ";
+		$where['sql'] = $where['sql'] . " AND (`user` = :user) ";
 		$where['binds']['user'] = $user;
 		$sql = "SELECT COUNT(keyword) as count, SUM(clicks) as sum FROM `$table_url` WHERE 1=1 " . $where['sql'];
 		$binds = $where['binds'];
 		$totals = $ydb->fetchObject($sql, $binds);
 	} else {
-		$where = $where . " AND (`user` = $user OR `user` IS NULL) ";
+		$where = $where . " AND (`user` = $user) ";
 		$totals = $ydb->get_results("SELECT COUNT(keyword) as count, SUM(clicks) as sum FROM `$table_url` WHERE 1=1 " . $where );
 	}
 	$return = array( 'total_links' => $totals->count, 'total_clicks' => $totals->sum );
@@ -265,11 +265,10 @@ function separate_users_is_valid( $keyword ) {
 
 	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
 		$binds = array( 'keyword' => $keyword, 'user' => $user);
-		$sql = "SELECT 1 FROM `$table` WHERE  (`user` IS NULL OR `user` = :user) AND `keyword` = :keyword";
+		$sql = "SELECT 1 FROM `$table` WHERE  (`user` = :user) AND `keyword` = :keyword";
 		$result = $ydb->fetchAffected($sql, $binds);
 	} else
-		$result = $ydb->query("SELECT 1 FROM `$table` WHERE  (`user` IS NULL OR `user` = $user) AND `keyword` = $keyword");
+		$result = $ydb->query("SELECT 1 FROM `$table` WHERE  (`user` = $user) AND `keyword` = $keyword");
 
 	return $result > 0;
 }
-
