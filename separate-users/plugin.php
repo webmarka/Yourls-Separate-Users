@@ -8,31 +8,31 @@ Author: Ian Barber <ian.barber@gmail.com>
 Author URI: http://phpir.com/
 */
 if((yourls_is_active_plugin('authMgrPlus/plugin.php')) !== false) {
-	die('Seperate Users is depricated to Auth Manager Plus.');
+	die('Separate Users is deprecated to Auth Manager Plus.');
 }
 /**
  * Set the environment variables
  *
  * @return array 
  */
-function seperate_users_env() {
+function separate_users_env() {
 
-	global $seperate_users_admin_user;
-	global $seperate_users_allowed_plugin_pages;
+	global $separate_users_admin_user;
+	global $separate_users_allowed_plugin_pages;
 
 	// have these been set in config.php?
-	if ( !isset( $seperate_users_admin_user) ) {
-		$seperate_users_admin_user = array('admin');
+	if ( !isset( $separate_users_admin_user) ) {
+		$separate_users_admin_user = array('admin');
 	}
 
-	if ( !isset( $seperate_users_allowed_plugin_pages) ) {
-		$seperate_users_allowed_plugin_pages = array();
+	if ( !isset( $separate_users_allowed_plugin_pages) ) {
+		$separate_users_allowed_plugin_pages = array();
 	}
 
 	// for other plugins to hook into for inclusion. Hint: array_merge()
-	yourls_apply_filter( 'seperate_users_allowed_plugin_pages', $seperate_users_allowed_plugin_pages );
+	yourls_apply_filter( 'separate_users_allowed_plugin_pages', $separate_users_allowed_plugin_pages );
 
-	return array('admins' => $seperate_users_admin_user, 'pages' => $seperate_users_allowed_plugin_pages);
+	return array('admins' => $separate_users_admin_user, 'pages' => $separate_users_allowed_plugin_pages);
 }
 
 /**
@@ -142,18 +142,18 @@ function separate_users_insert_link($actions) {
 yourls_add_filter( 'admin_list_where', 'separate_users_admin_list_where' );
 function separate_users_admin_list_where($where) {
 	$user = YOURLS_USER; 
-	$env = seperate_users_env();
+	$env = separate_users_env();
 
 	if(in_array($user, $env['admins'])) {
 		return $where; // Allow admin user to see the lot. 
 	}
 
 	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-		$where['sql'] = $where['sql'] . " AND (`user` = :user OR `user` IS NULL) ";
+		$where['sql'] = $where['sql'] . " AND (`user` = :user) ";
 		$where['binds']['user'] = $user;
 	}
 	else
-		$where = $where . " AND (`user` = $user OR `user` IS NULL) ";
+		$where = $where . " AND (`user` = $user) ";
 
 	return $where;
 }
@@ -169,7 +169,7 @@ yourls_add_filter( 'get_db_stats', 'separate_users_get_db_stats' );
 function separate_users_get_db_stats( $return, $where ) {
 
 	$user = YOURLS_USER;
-	$env = seperate_users_env();
+	$env = separate_users_env();
 
 	if(in_array($user, $env['admins'])) {
 		return $return; // Allow admin user to see the lot. 
@@ -180,13 +180,13 @@ function separate_users_get_db_stats( $return, $where ) {
 	$table_url = YOURLS_DB_TABLE_URL;
 
 	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
-		$where['sql'] = $where['sql'] . " AND (`user` = :user OR `user` IS NULL) ";
+		$where['sql'] = $where['sql'] . " AND (`user` = :user) ";
 		$where['binds']['user'] = $user;
 		$sql = "SELECT COUNT(keyword) as count, SUM(clicks) as sum FROM `$table_url` WHERE 1=1 " . $where['sql'];
 		$binds = $where['binds'];
 		$totals = $ydb->fetchObject($sql, $binds);
 	} else {
-		$where = $where . " AND (`user` = $user OR `user` IS NULL) ";
+		$where = $where . " AND (`user` = $user) ";
 		$totals = $ydb->get_results("SELECT COUNT(keyword) as count, SUM(clicks) as sum FROM `$table_url` WHERE 1=1 " . $where );
 	}
 	$return = array( 'total_links' => $totals->count, 'total_clicks' => $totals->sum );
@@ -198,8 +198,8 @@ function separate_users_get_db_stats( $return, $where ) {
 /**
  * Restricting Access to Plugin Administration(s) for non-admins
  */
-yourls_add_action( 'auth_successful', 'seperate_users_intercept_admin' );
-function seperate_users_intercept_admin() {
+yourls_add_action( 'auth_successful', 'separate_users_intercept_admin' );
+function separate_users_intercept_admin() {
 	// we use this GET param to send up a feedback notice to user
 	if ( isset( $_GET['access'] ) && $_GET['access']=='denied' ) {
 		yourls_add_notice('Access Denied');
@@ -207,7 +207,7 @@ function seperate_users_intercept_admin() {
 	// only worry about this with HTML draw
 	if(!yourls_is_API()) {
 		$user = YOURLS_USER; 
-		$env = seperate_users_env();
+		$env = separate_users_env();
 		$admin = in_array($user, $env['admins']) ? true : false;
 		// restrict access to plugin mgmt non-admins
 		if( !$admin ) {
@@ -232,7 +232,7 @@ function seperate_users_intercept_admin() {
 yourls_add_filter( 'admin_sublinks', 'separate_users_admin_sublinks' );
 function separate_users_admin_sublinks( $links ) {
 	$user = YOURLS_USER; 
-	$env = seperate_users_env();
+	$env = separate_users_env();
 	$admin = in_array($user, $env['admins']) ? true : false;
 	// restrict access to non-admins - removes from link list
 	if( !$admin ) {
@@ -255,7 +255,7 @@ function separate_users_is_valid( $keyword ) {
 	global $ydb; 
 
 	$user = YOURLS_USER;
-	$env = seperate_users_env();
+	$env = separate_users_env();
 
 	if(in_array($user, $env['admins'])) {
 		return true;
@@ -265,11 +265,10 @@ function separate_users_is_valid( $keyword ) {
 
 	if (version_compare(YOURLS_VERSION, '1.7.3') >= 0) {
 		$binds = array( 'keyword' => $keyword, 'user' => $user);
-		$sql = "SELECT 1 FROM `$table` WHERE  (`user` IS NULL OR `user` = :user) AND `keyword` = :keyword";
+		$sql = "SELECT 1 FROM `$table` WHERE  (`user` = :user) AND `keyword` = :keyword";
 		$result = $ydb->fetchAffected($sql, $binds);
 	} else
-		$result = $ydb->query("SELECT 1 FROM `$table` WHERE  (`user` IS NULL OR `user` = $user) AND `keyword` = $keyword");
+		$result = $ydb->query("SELECT 1 FROM `$table` WHERE  (`user` = $user) AND `keyword` = $keyword");
 
 	return $result > 0;
 }
-

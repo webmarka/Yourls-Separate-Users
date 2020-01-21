@@ -1,4 +1,4 @@
-YOURLS-Seperate-Users
+YOURLS-Separate-Users
 =====================
 
 A simple YouRLS plug to hide different users information from each other. 
@@ -24,14 +24,14 @@ Configuration
 -------------
 To allow a user named Tony admin access, add the following to `config.php`:
 ```
-$seperate_users_admin_user = array(
+$separate_users_admin_user = array(
 	'Tony',
 	'admin'
 );
 ```
 To allow the page for the `Sample Page` plugin included in YOURLS to be accessible to all users:
 ```
-$seperate_users_allowed_plugin_pages = array(
+$separate_users_allowed_plugin_pages = array(
 	'sample_page',
 	'some_other_plugin'
 );
@@ -41,7 +41,7 @@ Hooking into the filter
 -----------------------
 To allow a plugin with a plugin page slug of `my_page_slug` to be visible by default, add something like this to your code:
 ```
-yourls_add_filter('seperate_users_allowed_plugin_pages', 'my_snappy_function' );
+yourls_add_filter('separate_users_allowed_plugin_pages', 'my_snappy_function' );
 function my_snappy_function( $allowed_pages ) {
 
 	$allowed_pages[] = 'my_page_slug';
